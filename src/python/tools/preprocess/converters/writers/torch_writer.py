@@ -4,7 +4,7 @@ from omegaconf import OmegaConf
 
 from marius.tools.configuration.constants import PathConstants
 from marius.tools.configuration.marius_config import DatasetConfig
-
+import zarr
 
 class TorchWriter(object):
     def __init__(self, output_dir, partitioned_evaluation):
@@ -46,14 +46,17 @@ class TorchWriter(object):
 
         with open(self.output_dir / Path(PathConstants.train_edges_path), "wb") as f:
             f.write(bytes(train_edges_tens.numpy()))
+        zarr.save(self.output_dir / Path(PathConstants.train_edges_path + '.zarr'), train_edges_tens.numpy())
 
         if valid_edges_tens is not None:
             with open(self.output_dir / Path(PathConstants.valid_edges_path), "wb") as f:
                 f.write(bytes(valid_edges_tens.numpy()))
+            zarr.save(self.output_dir / Path(PathConstants.valid_edges_path + '.zarr'), valid_edges_tens.numpy())
 
         if test_edges_tens is not None:
             with open(self.output_dir / Path(PathConstants.test_edges_path), "wb") as f:
                 f.write(bytes(test_edges_tens.numpy()))
+            zarr.save(self.output_dir / Path(PathConstants.test_edges_path + '.zarr'), test_edges_tens.numpy())
 
         if num_partitions > 1:
             with open(self.output_dir / Path(PathConstants.train_edge_buckets_path), "w") as f:
